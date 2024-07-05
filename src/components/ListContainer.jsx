@@ -3,6 +3,9 @@ import axios from 'axios';
 import MovieCard from './MovieCard';
 import { MdOutlineSort } from "react-icons/md";
 
+const apiKey = process.env.REACT_APP_OMDB_API_KEY || '1d5e0453';
+const apiUrl = process.env.REACT_APP_API_URL || 'https://muvyz.up.railway.app';
+
 const ListContainer = () => {
   const [muvies, setMuvies] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -12,10 +15,12 @@ const ListContainer = () => {
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
 
+  
+
   useEffect(() => {
     const fetchMuvies = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/muvies');
+        const response = await axios.get(`${apiUrl}/muvies`);
         const data = response.data;
         setMuvies(data.slice(0, 10));
       } catch (error) {
@@ -26,6 +31,8 @@ const ListContainer = () => {
     fetchMuvies();
   }, []);
 
+
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewMovie({ ...newMovie, [name]: value });
@@ -34,54 +41,56 @@ const ListContainer = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/muvies', newMovie);
+      await axios.post(`${apiUrl}/muvies`, newMovie);
       setShowForm(false);
       setNewMovie({ title: '', year: '', rating: '', thumbnail: '' });
-      const response = await axios.get('http://localhost:5000/muvies');
+      const response = await axios.get(`${apiUrl}/muvies`);
       setMuvies(response.data.slice(0, 10));
     } catch (error) {
       console.error('Error adding movie:', error);
     }
   };
 
+
+  
+
   const handleSearchChange = async (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
+  const query = e.target.value;
+  setSearchQuery(query);
 
-    if (query.length > 2) {
-      try {
-        const response = await axios.get(`https://www.omdbapi.com/?s=${query}&apikey=1d5e0453`);
-        setSearchResults(response.data.Search || []);
-      } catch (error) {
-        console.error('Error fetching search results:', error);
-      }
-    } else {
-      setSearchResults([]);
-    }
-  };
-
-  const handleMovieSelect = async (movie) => {
-    setSearchQuery(movie.Title);
-    setSearchResults([]);
-    setSelectedMovie(movie);
-
+  if (query.length > 2) {
     try {
-      const response = await axios.get(`https://www.omdbapi.com/?i=${movie.imdbID}&apikey=1d5e0453`);
-      const data = response.data;
-      setNewMovie({
-        title: data.Title,
-        year: data.Year,
-        rating: data.imdbRating || '',
-        thumbnail: data.Poster,
-      });
+      const response = await axios.get(`https://www.omdbapi.com/?s=${query}&apikey=${apiKey}`);
+      setSearchResults(response.data.Search || []);
     } catch (error) {
-      console.error('Error fetching movie details:', error);
+      console.error('Error fetching search results:', error);
     }
-  };
+  } else {
+    setSearchResults([]);
+  }
+};
+const handleMovieSelect = async (movie) => {
+  setSearchQuery(movie.Title);
+  setSearchResults([]);
+  setSelectedMovie(movie);
+
+  try {
+    const response = await axios.get(`https://www.omdbapi.com/?i=${movie.imdbID}&apikey=${apiKey}`);
+    const data = response.data;
+    setNewMovie({
+      title: data.Title,
+      year: data.Year,
+      rating: data.imdbRating || '',
+      thumbnail: data.Poster,
+    });
+  } catch (error) {
+    console.error('Error fetching movie details:', error);
+  }
+};
 
   const handleDeleteMovie = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/muvies/${id}`);
+      await axios.delete(`${apiUrl}/muvies/${id}`);
       setMuvies((prevMuvies) => prevMuvies.filter((movie) => movie.id !== id));
     } catch (error) {
       console.error('Error deleting movie:', error);
@@ -197,7 +206,7 @@ const ListContainer = () => {
         </div>
       )}
 
-      <div className="list-container flex gap-4 w-full mx-auto mt-10" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-around" }}>
+      <div className="list-container flex  gap-8 w-full mx-auto mt-10" style={{ display: "flex", flexWrap: "wrap", justifyConten:"start" }}>
         {muvies.map((muvy) => (
           <MovieCard key={muvy.id} movie={muvy} onDelete={handleDeleteMovie} />
         ))}

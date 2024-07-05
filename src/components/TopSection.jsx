@@ -24,7 +24,7 @@ const TopSection = ({ setMuvies }) => {
     }
 
     try {
-      const response = await axios.get(`http://localhost:5000/muvies?title=${searchInput}`);
+      const response = await axios.get(`{process.env.REACT_APP_API_URL}/muvies?title=${searchInput}`);
       const data = response.data;
 
       if (data.length > 0) {

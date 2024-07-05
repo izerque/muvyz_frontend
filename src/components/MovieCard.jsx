@@ -10,7 +10,7 @@ const MovieCard = ({ movie, onDelete }) => {
       {movie && (
         <div className='border border-gray-200'>
           <div
-          className="movie-thumbnail bg-cover h-[200px] "
+          className="movie-thumbnail bg-cover bg-no-repeat  h-[200px] "
           style={{backgroundImage: `url(${movie.thumbnail})`}}
         >  
         </div>
